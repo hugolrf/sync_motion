@@ -1,4 +1,6 @@
 const axios = require("axios");
+const express = require('express');
+const app = express();
 
 // Configuração dos tokens de API
 const TODOIST_API_KEY = "e68bc41b21ea7a28b41f59b1cf7692fca2820e10"; // Substitua pelo seu token do Todoist
@@ -102,3 +104,13 @@ const startTaskScheduler = (intervalInSeconds, taskFunction) => {
   await syncTasks(); // Executa imediatamente antes do agendamento
   startTaskScheduler(60, syncTasks); // Agenda a cada 60 segundos (1 minuto)
 })();
+
+const PORT = 3000; // ou process.env.PORT, se configurado pelo ambiente
+
+app.get('/', (req, res) => {
+  res.status(200).send('Aplicação está rodando!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+})
