@@ -22,6 +22,35 @@ const fetchTodoistTasks = async () => {
   }
 };
 
+const createTaskWithAIInUsemotion = async (task) => {
+  const url = "https://api.usemotion.com/v1/tasks/ai";
+  const headers = {
+    "X-API-Key": USEMOTION_API_KEY,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+
+  // Combinamos título e descrição em um único texto para a IA processar
+  const taskText = `
+    Título: ${task.content}
+    Descrição: ${task.description || ""}
+  `;
+
+  const payload = {
+    text: taskText,
+    workspaceId: "rOU1dgxfycJMM5VciMsSk",
+  };
+
+  try {
+    const response = await axios.post(url, payload, { headers });
+    console.log("Tarefa criada pela IA do Usemotion:", response.data);
+    return response.data;
+  } catch (err) {
+    console.error(`Erro ao criar tarefa com IA no Usemotion: ${err.response?.data || err.message}`);
+    return null;
+  }
+};
+
 // Função para criar uma nova tarefa no Usemotion
 const createTaskInUsemotion = async (task) => {
   const url = "https://api.usemotion.com/v1/tasks";
@@ -33,6 +62,7 @@ const createTaskInUsemotion = async (task) => {
 
   const payload = {
     name: task.content, // O nome da tarefa do Todoist
+    description: task.description || "",
     workspaceId: "rOU1dgxfycJMM5VciMsSk", // Substitua pelo ID válido do workspace
   };
 
@@ -66,8 +96,15 @@ const syncTasks = async () => {
   const tasks = await fetchTodoistTasks();
 
   for (const task of tasks) {
-    console.log(`Processando tarefa: ${task.content} [ID: ${task.id}]`);
-    const usemotionTask = await createTaskInUsemotion(task);
+    console.log(`
+    Processando tarefa:
+    - Título: ${task.content}
+    - ID: ${task.id}
+    - Descrição: ${task.description || "Sem descrição"}
+    `);
+
+    const usemotionTask = await createTaskWithAIInUsemotion
+    (task);
 
     if (usemotionTask) {
       await markTaskAsDoneInTodoist(task.id);
