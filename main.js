@@ -5,6 +5,7 @@ const app = express();
 // Configuração dos tokens de API
 const TODOIST_API_KEY = "e68bc41b21ea7a28b41f59b1cf7692fca2820e10"; // Substitua pelo seu token do Todoist
 const USEMOTION_API_KEY = "4hmJXuchtC1MhlJ6rNkY+TqD085sCt84iRefG0kaqs8="; // Substitua pelo seu token do Usemotion
+const WORKSPACE_ID = "zbBICisk6HNg4EdnysTNg";
 
 // Função para buscar tarefas do Todoist
 const fetchTodoistTasks = async () => {
@@ -38,7 +39,7 @@ const createTaskWithAIInUsemotion = async (task) => {
 
   const payload = {
     text: taskText,
-    workspaceId: "rOU1dgxfycJMM5VciMsSk",
+    workspaceId: WORKSPACE_ID,
   };
 
   try {
@@ -63,7 +64,7 @@ const createTaskInUsemotion = async (task) => {
   const payload = {
     name: task.content, // O nome da tarefa do Todoist
     description: task.description || "",
-    workspaceId: "rOU1dgxfycJMM5VciMsSk", // Substitua pelo ID válido do workspace
+    workspaceId: WORKSPACE_ID, // Substitua pelo ID válido do workspace
   };
 
   try {
@@ -103,8 +104,7 @@ const syncTasks = async () => {
     - Descrição: ${task.description || "Sem descrição"}
     `);
 
-    const usemotionTask = await createTaskWithAIInUsemotion
-    (task);
+    const usemotionTask = await createTaskInUsemotion(task);
 
     if (usemotionTask) {
       await markTaskAsDoneInTodoist(task.id);
